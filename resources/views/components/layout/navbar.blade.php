@@ -21,7 +21,7 @@
                     <x-ui.nav-link href="{{ route('blog') }}" :active="request()->routeIs('blog')">Blog</x-ui.nav-link>
                     <x-ui.nav-link href="{{ route('about') }}" :active="request()->routeIs('about')">Tentang</x-ui.nav-link>
                     <x-ui.nav-link href="{{ route('contact') }}" :active="request()->routeIs('contact')">Kontak</x-ui.nav-link>
-                    <x-ui.nav-link href="{{ route('cart.index') }}" :active="request()->routeIs('cart.*')">Keranjang</x-ui.nav-link>
+                   <x-ui.nav-link href="{{ route('cart.index') }}" :active="request()->routeIs('cart.*')">Keranjang</x-ui.nav-link>
                 </div>
             </div>
 
@@ -83,7 +83,8 @@
             <x-ui.nav-link-mobile href="{{ route('blog') }}" :active="request()->routeIs('blog')">Blog</x-ui.nav-link-mobile>
             <x-ui.nav-link-mobile href="{{ route('about') }}" :active="request()->routeIs('about')">Tentang</x-ui.nav-link-mobile>
             <x-ui.nav-link-mobile href="{{ route('contact') }}" :active="request()->routeIs('contact')">Kontak</x-ui.nav-link-mobile>
-            <x-ui.nav-link-mobile href="{{ route('cart.index') }}" :active="request()->routeIs('cart.*')">Keranjang</x-ui.nav-link-mobile>
+            <x-ui.nav-link href="{{ route('cart.index') }}" :active="request()->routeIs('cart.*')">Keranjang</x-ui.nav-link>
+
 
             <!-- Tombol Booking -->
             <div class="pt-2">
