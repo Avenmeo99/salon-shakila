@@ -96,12 +96,12 @@ class BookingController extends Controller
             $this->addServiceToCart($request, $service);
 
             return redirect()
-                ->route('checkout.show')
+                ->route('checkout.index')
                 ->with('status', 'Booking dibuat. Lanjutkan pembayaran melalui checkout.');
         }
 
         return redirect()
-            ->route('bookings.thanks', ['service' => $service->slug])
+            ->route('bookings.service.thanks', ['service' => $service->slug])
             ->with('status', 'Booking berhasil dibuat. Kami akan menghubungi Anda segera.');
     }
 

@@ -56,7 +56,7 @@ Route::middleware('auth')->group(function () {
     // Booking
     Route::get('/services/{service:slug}/booking', [BookingController::class, 'create'])->name('bookings.create');
     Route::post('/services/{service:slug}/booking', [BookingController::class, 'store'])->name('bookings.store');
-    Route::get('/services/{service:slug}/thanks', [BookingController::class, 'thanks'])->name('bookings.thanks');
+    Route::get('/services/{service:slug}/thanks', [BookingController::class, 'thanks'])->name('bookings.service.thanks');
 
     // Cart
     Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
@@ -67,8 +67,10 @@ Route::middleware('auth')->group(function () {
     Route::delete('/cart', [CartController::class, 'clear'])->name('cart.clear');
 
     // Checkout
-    Route::get('/checkout', [CheckoutController::class, 'show'])->name('checkout.show');
-    Route::post('/checkout', [CheckoutController::class, 'process'])->name('checkout.process');
+    Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout.index');
+    Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout.store');
+
+    Route::view('/thanks', 'bookings.thanks')->name('bookings.thanks');
 
     // Static pages (kita kunci agar hanya user login yang bisa akses)
     Route::view('/blog', 'blog')->name('blog');

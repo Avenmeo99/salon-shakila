@@ -104,9 +104,20 @@
                             </div>
                         </dl>
 
-                        <div class="mt-6 space-y-3">
-                            <a href="{{ route('checkout.show') }}" class="inline-flex w-full items-center justify-center gap-2 rounded-full bg-pink-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-pink-200 transition hover:bg-pink-700">
-                                Lanjutkan ke Checkout
+                        <div class="mt-6 space-y-4">
+                            <div class="rounded-2xl border border-pink-100 bg-white/70 px-4 py-3 text-sm text-gray-600">
+                                <div class="flex items-center justify-between">
+                                    <span>Total Item</span>
+                                    <span class="font-semibold text-gray-900">{{ $cart->items->sum('qty') }}</span>
+                                </div>
+                                <div class="mt-2 flex items-center justify-between">
+                                    <span>Total Harga</span>
+                                    <span class="font-semibold text-gray-900">Rp{{ number_format($cart->total, 0, ',', '.') }}</span>
+                                </div>
+                            </div>
+
+                            <a href="{{ route('checkout.index') }}" class="inline-flex w-full items-center justify-center gap-2 rounded-full bg-pink-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-pink-200 transition hover:bg-pink-700">
+                                Bayar Sekarang
                                 <i class="fa-solid fa-arrow-right"></i>
                             </a>
                             <a href="{{ route('services.index') }}" class="inline-flex w-full items-center justify-center gap-2 rounded-full border border-pink-200 px-6 py-3 text-sm font-semibold text-pink-600 transition hover:bg-white">
