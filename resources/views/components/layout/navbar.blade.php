@@ -19,7 +19,8 @@
                     <x-ui.nav-link href="{{ route('branda') }}" :active="request()->routeIs('branda')">Beranda</x-ui.nav-link>
                     <x-ui.nav-link href="{{ route('services') }}" :active="request()->routeIs('services')">Layanan</x-ui.nav-link>
                     <x-ui.nav-link href="{{ route('blog') }}" :active="request()->routeIs('blog')">Blog</x-ui.nav-link>
-                    <x-ui.nav-link href="{{ route('about') }}" :active="request()->routeIs('about')">About</x-ui.nav-link>
+                    <x-ui.nav-link href="{{ route('about') }}" :active="request()->routeIs('about')">Tentang</x-ui.nav-link>
+                    <x-ui.nav-link href="{{ route('contact') }}" :active="request()->routeIs('contact')">Kontak</x-ui.nav-link>
                 </div>
             </div>
 
@@ -79,7 +80,8 @@
             <x-ui.nav-link-mobile href="{{ route('branda') }}" :active="request()->routeIs('branda')">Beranda</x-ui.nav-link-mobile>
             <x-ui.nav-link-mobile href="{{ route('services') }}" :active="request()->routeIs('services')">Layanan</x-ui.nav-link-mobile>
             <x-ui.nav-link-mobile href="{{ route('blog') }}" :active="request()->routeIs('blog')">Blog</x-ui.nav-link-mobile>
-            <x-ui.nav-link-mobile href="{{ route('about') }}" :active="request()->routeIs('about')">About</x-ui.nav-link-mobile>
+            <x-ui.nav-link-mobile href="{{ route('about') }}" :active="request()->routeIs('about')">Tentang</x-ui.nav-link-mobile>
+            <x-ui.nav-link-mobile href="{{ route('contact') }}" :active="request()->routeIs('contact')">Kontak</x-ui.nav-link-mobile>
 
             <!-- Tombol Booking -->
             <div class="pt-2">
