@@ -13,29 +13,56 @@
                         Nikmati layanan kecantikan terbaik dengan terapis profesional, produk berkualitas,
                         dan sistem booking online yang mudah dan praktis.
                     </p>
-                    <div class="mt-6 flex space-x-4">
-                        <a href="{{ route('branda') }}"
-                          class="px-6 py-3 rounded-lg bg-gradient-to-r from-pink-500 to-purple-600 text-white font-semibold shadow-md hover:opacity-90 transition">
-                            Mulai Jelajahi
-                        </a>
 
-                        <a href="{{ route('services') }}"
-                           class="px-6 py-3 rounded-lg border border-pink-500 text-pink-600 font-semibold hover:bg-pink-50 transition">
-                            Lihat Layanan
-                        </a>
+                    <div class="mt-6 flex flex-wrap gap-3">
+                        @guest
+                            <!-- Belum login -->
+                            <a href="{{ route('login') }}"
+                               class="px-6 py-3 rounded-lg bg-gradient-to-r from-pink-500 to-purple-600 text-white font-semibold shadow-md hover:opacity-90 transition">
+                                Mulai Jelajahi
+                            </a>
+                            <a href="{{ route('login') }}"
+                               class="px-6 py-3 rounded-lg border border-pink-500 text-pink-600 font-semibold hover:bg-pink-50 transition">
+                                Lihat Layanan
+                            </a>
+                        @else
+                            <!-- Sudah login -->
+                            <a href="{{ route('branda') }}"
+                               class="px-6 py-3 rounded-lg bg-gradient-to-r from-pink-500 to-purple-600 text-white font-semibold shadow-md hover:opacity-90 transition">
+                                Mulai Jelajahi
+                            </a>
+                            <a href="{{ route('services.index') }}"
+                               class="px-6 py-3 rounded-lg border border-pink-500 text-pink-600 font-semibold hover:bg-pink-50 transition">
+                                Lihat Layanan
+                            </a>
+
+                            <!-- CTA tambahan -->
+                            <a href="{{ route('services.index') }}"
+                               class="px-6 py-3 rounded-lg bg-pink-100 text-pink-700 font-semibold hover:bg-pink-200 transition border border-pink-300">
+                                Booking Sekarang
+                            </a>
+                        @endauth
                     </div>
+
+                    @guest
+                        <p class="mt-4 text-sm text-gray-500">
+                            Belum punya akun?
+                            <a href="{{ route('register') }}" class="font-semibold text-pink-600 hover:text-pink-700">Daftar sekarang</a>
+                            untuk mulai booking & checkout.
+                        </p>
+                    @endguest
                 </div>
 
                 <!-- Images -->
                 <div class="grid grid-cols-2 gap-4">
-                    <img src="{{ asset('img/salon1.jpg') }}" alt="Salon Shakila 1"
-                         class="w-full aspect-square object-cover rounded-lg shadow-lg">
-                    <img src="{{ asset('img/salon2.jpg') }}" alt="Salon Shakila 2"
-                         class="w-full aspect-square object-cover rounded-lg shadow-lg">
-                    <img src="{{ asset('img/salon3.jpg') }}" alt="Salon Shakila 3"
-                         class="w-full aspect-square object-cover rounded-lg shadow-lg">
-                    <img src="{{ asset('img/salon4.jpg') }}" alt="Salon Shakila 4"
-                         class="w-full aspect-square object-cover rounded-lg shadow-lg">
+                    <img src="{{ asset('img/salon1.jpg') }}" alt="Ruang layanan Salon Shakila"
+                         loading="lazy" class="w-full aspect-square object-cover rounded-lg shadow-lg">
+                    <img src="{{ asset('img/salon2.jpg') }}" alt="Peralatan profesional di Salon Shakila"
+                         loading="lazy" class="w-full aspect-square object-cover rounded-lg shadow-lg">
+                    <img src="{{ asset('img/salon3.jpg') }}" alt="Proses perawatan kecantikan di Salon Shakila"
+                         loading="lazy" class="w-full aspect-square object-cover rounded-lg shadow-lg">
+                    <img src="{{ asset('img/salon4.jpg') }}" alt="Hasil perawatan pelanggan di Salon Shakila"
+                         loading="lazy" class="w-full aspect-square object-cover rounded-lg shadow-lg">
                 </div>
             </div>
         </div>

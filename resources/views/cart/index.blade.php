@@ -1,76 +1,87 @@
-<x-layout.base title="Keranjang Anda">
-    <section class="bg-gray-50 py-16 min-h-[60vh]">
-        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="mb-8">
-                <h1 class="text-3xl font-bold text-gray-900">Keranjang Pemesanan</h1>
-                <p class="mt-2 text-gray-600">Tinjau layanan pilihan Anda sebelum melanjutkan ke pembayaran.</p>
-            </div>
+<x-layout.base :title="'Layanan — Shakila Salon'">
 
-            @if(session('status'))
-                <div class="mb-6 rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-green-800">
-                    {{ session('status') }}
-                </div>
-            @endif
+  {{-- Header / Hero mini --}}
+  <section class="bg-gradient-to-b from-pink-50 to-white py-14">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <p class="text-center text-xs tracking-widest text-pink-600 font-semibold">SHAKILA SALON</p>
+      <h1 class="mt-3 text-center text-4xl font-extrabold text-gray-900">Pesan & Bayar Langsung</h1>
+      <p class="mx-auto mt-3 max-w-2xl text-center text-gray-600">
+        Pilih layanan favorit atau paket hemat, masukkan ke keranjang, atau lakukan booking pada jam yang Anda inginkan.
+      </p>
 
-            @if(session('error'))
-                <div class="mb-6 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-red-800">
-                    {{ session('error') }}
-                </div>
-            @endif
+      <div class="mt-4 flex justify-end">
+        <a href="{{ route('cart.index') }}" class="inline-flex items-center gap-2 text-pink-600 font-semibold hover:text-pink-700">
+          <i class="fa-solid fa-cart-shopping"></i> Lihat Keranjang
+        </a>
+      </div>
 
-            @if(!$cart || $cart->items->isEmpty())
-                <div class="bg-white border border-dashed border-gray-300 rounded-3xl p-12 text-center text-gray-500">
-                    Keranjang Anda masih kosong. <a href="{{ route('services.index') }}" class="text-pink-600 hover:text-pink-700 font-semibold">Lihat layanan</a> untuk mulai berbelanja.
-                </div>
-            @else
-                <div class="bg-white shadow-xl rounded-3xl overflow-hidden">
-                    <div class="divide-y divide-gray-100">
-                        @foreach($cart->items as $item)
-                            <div class="p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                                <div>
-                                    <h3 class="text-lg font-semibold text-gray-900">{{ $item->name_cache }}</h3>
-                                    <p class="text-sm text-gray-500">Rp{{ number_format($item->unit_price, 0, ',', '.') }} / layanan</p>
-                                </div>
-                                <div class="flex items-center gap-4">
-                                    <form action="{{ route('cart.update', $item->id) }}" method="POST" class="flex items-center gap-3">
-                                        @csrf
-                                        @method('PATCH')
-                                        <label class="text-sm text-gray-600">
-                                            Jumlah
-                                            <input type="number" min="1" name="qty" value="{{ $item->qty }}" class="w-20 ml-2 rounded-lg border-gray-300 focus:border-pink-500 focus:ring-pink-500">
-                                        </label>
-                                        <button type="submit" class="text-sm text-pink-600 hover:text-pink-700 font-semibold">Perbarui</button>
-                                    </form>
-                                    <form action="{{ route('cart.remove', $item->id) }}" method="POST">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="text-sm text-gray-400 hover:text-red-500">Hapus</button>
-                                    </form>
-                                </div>
-                                <div class="text-right">
-                                    <p class="text-xs text-gray-500">Total</p>
-                                    <p class="text-xl font-bold text-gray-900">Rp{{ number_format($item->unit_price * $item->qty, 0, ',', '.') }}</p>
-                                </div>
-                            </div>
-                        @endforeach
-                    </div>
-                    <div class="bg-gray-50 border-t border-gray-100 p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                        <div class="text-sm text-gray-600 space-y-1">
-                            <p>Subtotal: <span class="font-semibold text-gray-900">Rp{{ number_format($cart->subtotal, 0, ',', '.') }}</span></p>
-                            <p>Diskon: <span class="font-semibold text-gray-900">Rp{{ number_format($cart->discount, 0, ',', '.') }}</span></p>
-                            <p class="text-base font-bold text-gray-900">Total: Rp{{ number_format($cart->total, 0, ',', '.') }}</p>
-                        </div>
-                        <div class="flex flex-wrap gap-3">
-                            <form action="{{ route('cart.clear') }}" method="POST">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="px-4 py-2 text-sm font-semibold text-gray-500 hover:text-red-500">Kosongkan Keranjang</button>
-                            </form>
-                            <a href="{{ route('checkout.show') }}" class="inline-flex items-center px-5 py-3 rounded-full bg-pink-600 text-white text-sm font-semibold hover:bg-pink-700">Lanjut Checkout</a>
-                        </div>
-                    </div>
-                </div>
-            @endif
+      {{-- search + tabs --}}
+      <div class="mt-6 grid gap-3 sm:grid-cols-3">
+        {{-- Search --}}
+        <form method="GET" class="sm:col-span-2">
+          <div class="relative">
+            <input type="text" name="q" value="{{ request('q') }}"
+                   class="w-full rounded-full border-gray-200 pl-11 pr-4 py-3 focus:border-pink-500 focus:ring-pink-500"
+                   placeholder="Cari layanan atau paket…">
+            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
+              <i class="fa-solid fa-magnifying-glass"></i>
+            </span>
+          </div>
+        </form>
+
+        {{-- Tabs anchor (pakai anchor sederhana agar tanpa JS) --}}
+        <div class="flex items-center justify-start sm:justify-end gap-2">
+          @php $tab = request('tab', 'packages'); @endphp
+          <a href="{{ route('services.index', array_merge(request()->except('page'), ['tab' => 'packages'])) }}"
+             class="rounded-full px-4 py-2 text-sm font-semibold {{ $tab==='packages' ? 'bg-pink-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' }}">
+            Paket
+          </a>
+          <a href="{{ route('services.index', array_merge(request()->except('page'), ['tab' => 'single'])) }}"
+             class="rounded-full px-4 py-2 text-sm font-semibold {{ $tab==='single' ? 'bg-pink-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' }}">
+            Satuan
+          </a>
         </div>
-    </section>
+      </div>
+    </div>
+  </section>
+
+  {{-- Konten --}}
+  <section class="py-10">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+      {{-- Paket Populer --}}
+      @if($tab === 'packages')
+        <h2 class="text-xl font-bold text-gray-900 mb-4">Paket Populer</h2>
+        @if(isset($packageServices) && count($packageServices))
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            @foreach($packageServices as $service)
+              <x-ui.service-card :service="$service" :isPackage="true" />
+            @endforeach
+          </div>
+        @else
+          <div class="rounded-2xl border border-yellow-200 bg-yellow-50 p-4 text-yellow-800">
+            Belum ada paket yang tersedia.
+          </div>
+        @endif
+      @endif
+
+      {{-- Layanan Satuan --}}
+      @if($tab === 'single')
+        <h2 class="text-xl font-bold text-gray-900 mb-4">Layanan Perawatan</h2>
+        @if(isset($singleServices) && count($singleServices))
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            @foreach($singleServices as $service)
+              <x-ui.service-card :service="$service" />
+            @endforeach
+          </div>
+        @else
+          <div class="rounded-2xl border border-yellow-200 bg-yellow-50 p-4 text-yellow-800">
+            Belum ada layanan yang tersedia.
+          </div>
+        @endif
+      @endif
+
+    </div>
+  </section>
+
 </x-layout.base>

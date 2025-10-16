@@ -17,13 +17,14 @@
             <!-- Quick Links -->
             <div>
                 <h3 class="text-lg font-semibold mb-4">Menu Cepat</h3>
-                <ul class="space-y-2">
-                    <li><a href="{{ route('services') }}" class="text-gray-300 hover:text-pink-400 transition-colors duration-200">Layanan</a></li>
-                    <li><a href="{{ route('about') }}" class="text-gray-300 hover:text-pink-400 transition-colors duration-200">About</a></li>
-                    <li><a href="{{ route('blog') }}" class="text-gray-300 hover:text-pink-400 transition-colors duration-200">Blog</a></li>
-                    <li><a href="{{ route('booking') }}" class="text-gray-300 hover:text-pink-400 transition-colors duration-200">Booking</a></li>
-                    <li><a href="{{ route('contact') }}" class="text-gray-300 hover:text-pink-400 transition-colors duration-200">Kontak</a></li>
-                </ul>
+               <ul class="space-y-2">
+                  <li><a href="{{ route('services.index') }}" class="text-gray-300 hover:text-pink-400 transition-colors duration-200">Layanan</a></li>
+                  <li><a href="{{ route('blog') }}" class="text-gray-300 hover:text-pink-400 transition-colors duration-200">Blog</a></li>
+  {{-- Booking per layanan (butuh slug), jadi di footer kita arahkan ke daftar layanan dulu --}}
+                <li><a href="{{ route('services.index') }}" class="text-gray-300 hover:text-pink-400 transition-colors duration-200">Booking</a></li>
+                 <li><a href="{{ route('contact') }}" class="text-gray-300 hover:text-pink-400 transition-colors duration-200">Kontak</a></li>
+                    </ul>
+
             </div>
 
             <!-- Contact Info -->

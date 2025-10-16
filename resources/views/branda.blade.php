@@ -8,13 +8,15 @@
         subtitle="Salon kecantikan terpercaya dengan layanan profesional dan produk berkualitas tinggi">
         
         <x-slot name="primaryButton">
-            <x-ui.button href="{{ route('booking') }}" variant="white" size="lg">
+            {{-- Dulu: route('booking') → booking kini per-layanan, jadi arahkan ke daftar layanan --}}
+            <x-ui.button href="{{ route('services.index') }}" variant="white" size="lg">
                 Booking Sekarang
             </x-ui.button>
         </x-slot>
         
         <x-slot name="secondaryButton">
-            <x-ui.button href="{{ route('services') }}" variant="secondary" size="lg">
+            {{-- Dulu: route('services') --}}
+            <x-ui.button href="{{ route('services.index') }}" variant="secondary" size="lg">
                 Lihat Layanan
             </x-ui.button>
         </x-slot>
@@ -73,7 +75,7 @@
                 <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
                     Layanan Unggulan Kami
                 </h2>
-                <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+            <p class="text-xl text-gray-600 max-w-3xl mx-auto">
                     Berbagai layanan kecantikan lengkap untuk memenuhi kebutuhan perawatan Anda
                 </p>
             </div>
@@ -134,7 +136,8 @@
             </div>
 
             <div class="text-center mt-12">
-                <x-ui.button href="{{ route('services') }}" variant="primary" size="default">
+                {{-- Dulu: route('services') --}}
+                <x-ui.button href="{{ route('services.index') }}" variant="primary" size="default">
                     Lihat Semua Layanan
                 </x-ui.button>
             </div>
@@ -185,7 +188,8 @@
                 Booking sekarang dan rasakan pengalaman kecantikan terbaik di Salon Shakila
             </p>
             <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                <x-ui.button href="{{ route('booking') }}" variant="white" size="lg">
+                {{-- Dulu: route('booking') --}}
+                <x-ui.button href="{{ route('services.index') }}" variant="white" size="lg">
                     Booking Sekarang
                 </x-ui.button>
                 <x-ui.button href="tel:+6221234567" variant="secondary" size="lg">
