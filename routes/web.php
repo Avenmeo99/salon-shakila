@@ -1,37 +1,34 @@
 <?php
 
+use App\Http\Controllers\CartController;
+use App\Http\Controllers\CheckoutController;
+use App\Http\Controllers\PaymentWebhookController;
+use App\Http\Controllers\ServiceController;
 use Illuminate\Support\Facades\Route;
 
-// Halaman Welcome (default)
-Route::get('/', function () {
-    return view('home'); 
-})->name('home');
+Route::get('/', fn () => redirect()->route('services.index'))->name('home');
 
-// Homepage dengan komponen
-Route::get('/branda', function () {
-    return view('branda');
-})->name('branda');
+Route::get('/services', [ServiceController::class, 'index'])->name('services.index');
+Route::get('/services/{slug}', [ServiceController::class, 'show'])->name('services.show');
 
-// Services dengan komponen
-Route::get('/layanan', function () {
-    return view('services-components');
-})->name('services');
+Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
+Route::post('/cart', [CartController::class, 'add'])->name('cart.add');
+Route::patch('/cart/item/{id}', [CartController::class, 'updateQty'])->name('cart.update');
+Route::delete('/cart/item/{id}', [CartController::class, 'remove'])->name('cart.remove');
+Route::delete('/cart', [CartController::class, 'clear'])->name('cart.clear');
 
-Route::get('/blog', function () {
-    return view('blog');
-})->name('blog');
+Route::get('/checkout', [CheckoutController::class, 'show'])->name('checkout.show');
+Route::post('/checkout', [CheckoutController::class, 'process'])->name('checkout.process');
 
-Route::get('/booking', function () {
-    return view('booking');
-})->name('booking');
+Route::post('/payment/midtrans/callback', [PaymentWebhookController::class, 'midtrans'])->name('payment.midtrans.callback');
 
-Route::get('/kontak', function () {
-    return view('contact');
-})->name('contact');
-
-Route::get('/tentang', function () {
-    return view('about');
-})->name('about');
+Route::view('/blog', 'blog')->name('blog');
+Route::view('/booking', 'booking')->name('booking');
+Route::view('/contact', 'contact')->name('contact');
+Route::view('/about', 'about')->name('about');
+Route::view('/branda', 'branda')->name('branda');
+Route::view('/home', 'home');
+Route::view('/services-components', 'services-components');
 
 
 
