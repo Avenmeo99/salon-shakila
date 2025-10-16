@@ -55,6 +55,7 @@
             </div>
 
             <div class="mt-10 flex flex-wrap gap-4">
+                <a href="{{ route('bookings.create', ['service' => $service->slug]) }}" class="inline-flex items-center px-5 py-3 rounded-full bg-white border border-pink-200 text-pink-600 hover:bg-pink-50 text-sm font-semibold">Booking</a>
                 <a href="{{ route('cart.index') }}" class="inline-flex items-center px-5 py-3 rounded-full bg-gray-100 text-gray-700 hover:bg-gray-200 text-sm font-semibold">Lihat Keranjang</a>
                 <a href="{{ route('checkout.show') }}" class="inline-flex items-center px-5 py-3 rounded-full bg-pink-600 text-white hover:bg-pink-700 text-sm font-semibold">Lanjut ke Checkout</a>
             </div>

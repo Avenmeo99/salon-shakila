@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\BookingController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\PaymentWebhookController;
@@ -9,6 +10,9 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', fn () => redirect()->route('services.index'))->name('home');
 
 Route::get('/services', [ServiceController::class, 'index'])->name('services.index');
+Route::get('/services/{service:slug}/booking', [BookingController::class, 'create'])->name('bookings.create');
+Route::post('/services/{service:slug}/booking', [BookingController::class, 'store'])->name('bookings.store');
+Route::get('/services/{service:slug}/thanks', [BookingController::class, 'thanks'])->name('bookings.thanks');
 Route::get('/services/{slug}', [ServiceController::class, 'show'])->name('services.show');
 
 Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
