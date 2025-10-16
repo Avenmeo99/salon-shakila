@@ -24,7 +24,31 @@
                 </div>
             @endif
 
-            @if($cart->items->isEmpty())
+            @php
+                $sessionCart = session('cart', ['items' => []]);
+                $rawItems = $items ?? null;
+
+                if (! $rawItems && isset($cart)) {
+                    $rawItems = $cart->items ?? data_get($cart, 'items', []);
+                }
+
+                if (! $rawItems) {
+                    $rawItems = $sessionCart['items'] ?? [];
+                }
+
+                $itemsCollection = collect($rawItems);
+                $totalQuantity = $itemsCollection->sum(function ($item) {
+                    return (int) (data_get($item, 'qty') ?? 1);
+                });
+                $grandTotal = $itemsCollection->sum(function ($item) {
+                    $price = data_get($item, 'price') ?? data_get($item, 'unit_price') ?? 0;
+                    $qty = data_get($item, 'qty') ?? 1;
+
+                    return (float) $price * (int) $qty;
+                });
+            @endphp
+
+            @if($itemsCollection->isEmpty())
                 <div class="rounded-3xl border border-dashed border-gray-300 bg-white px-10 py-14 text-center">
                     <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-pink-100 text-pink-600">
                         <i class="fa-solid fa-cart-shopping text-2xl"></i>
@@ -41,38 +65,28 @@
             @else
                 <div class="grid gap-8 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
                     <div class="space-y-6">
-                        @foreach($cart->items as $item)
+                        @foreach($itemsCollection as $item)
+                            @php
+                                $name = $item['name'] ?? data_get($item, 'name') ?? data_get($item, 'name_cache') ?? 'Layanan';
+                                $qty = (int) ($item['qty'] ?? data_get($item, 'qty', 1));
+                                $price = (float) ($item['price'] ?? data_get($item, 'price') ?? data_get($item, 'unit_price') ?? 0);
+                                $slot = $item['slot'] ?? data_get($item, 'slot');
+                                $subtotal = $price * $qty;
+                            @endphp
                             <div class="rounded-3xl border border-pink-100 bg-white p-6 shadow-sm">
                                 <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                                     <div>
-                                        <p class="text-lg font-semibold text-gray-900">{{ $item->name_cache }}</p>
-                                        <p class="text-sm text-gray-500">@if($item->service?->duration) {{ $item->service?->duration }} menit · @endifRp{{ number_format($item->unit_price, 0, ',', '.') }} / layanan</p>
+                                        <p class="text-lg font-semibold text-gray-900">{{ $name }}</p>
+                                        <p class="text-sm text-gray-500">Qty: {{ $qty }} · Rp{{ number_format($price, 0, ',', '.') }}</p>
+                                        @if(! empty($slot))
+                                            <p class="mt-1 text-sm text-gray-500">Jadwal: {{ $slot }}</p>
+                                        @endif
                                     </div>
-                                    <form action="{{ route('cart.remove', $item->id) }}" method="POST" class="sm:ml-4">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="inline-flex items-center text-sm font-semibold text-gray-400 hover:text-red-500 transition" aria-label="Hapus layanan dari keranjang">
-                                            <i class="fa-solid fa-xmark mr-1"></i> Hapus
-                                        </button>
-                                    </form>
                                 </div>
 
-                                <div class="mt-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                                    <form action="{{ route('cart.update', $item->id) }}" method="POST" class="flex items-center gap-3">
-                                        @csrf
-                                        @method('PATCH')
-                                        <label for="qty-{{ $item->id }}" class="text-sm font-medium text-gray-700">Jumlah</label>
-                                        <div class="flex items-center rounded-full border border-gray-200 bg-gray-50 px-2">
-                                            <input id="qty-{{ $item->id }}" name="qty" type="number" min="1" value="{{ $item->qty }}" class="w-20 border-0 bg-transparent text-center text-sm font-semibold text-gray-900 focus:ring-0" />
-                                        </div>
-                                        <button type="submit" class="rounded-full bg-pink-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-pink-700">
-                                            Perbarui
-                                        </button>
-                                    </form>
-
-                                    <p class="text-lg font-semibold text-gray-900">
-                                        Rp{{ number_format($item->unit_price * $item->qty, 0, ',', '.') }}
-                                    </p>
+                                <div class="mt-4 flex items-center justify-between">
+                                    <span class="text-sm font-medium text-gray-600">Subtotal</span>
+                                    <span class="text-lg font-semibold text-gray-900">Rp{{ number_format($subtotal, 0, ',', '.') }}</span>
                                 </div>
                             </div>
                         @endforeach
@@ -91,34 +105,18 @@
                         <h2 class="text-lg font-semibold text-gray-900">Ringkasan</h2>
                         <dl class="mt-4 space-y-3 text-sm text-gray-600">
                             <div class="flex items-center justify-between">
-                                <dt>Subtotal</dt>
-                                <dd class="font-semibold text-gray-900">Rp{{ number_format($cart->subtotal, 0, ',', '.') }}</dd>
-                            </div>
-                            <div class="flex items-center justify-between">
-                                <dt>Diskon</dt>
-                                <dd class="font-semibold text-gray-900">Rp{{ number_format($cart->discount, 0, ',', '.') }}</dd>
+                                <dt>Total Item</dt>
+                                <dd class="font-semibold text-gray-900">{{ $totalQuantity }}</dd>
                             </div>
                             <div class="flex items-center justify-between border-t border-pink-100 pt-3 text-base font-semibold text-gray-900">
                                 <dt>Total</dt>
-                                <dd>Rp{{ number_format($cart->total, 0, ',', '.') }}</dd>
+                                <dd>Rp{{ number_format($grandTotal, 0, ',', '.') }}</dd>
                             </div>
                         </dl>
 
                         <div class="mt-6 space-y-4">
-                            <div class="rounded-2xl border border-pink-100 bg-white/70 px-4 py-3 text-sm text-gray-600">
-                                <div class="flex items-center justify-between">
-                                    <span>Total Item</span>
-                                    <span class="font-semibold text-gray-900">{{ $cart->items->sum('qty') }}</span>
-                                </div>
-                                <div class="mt-2 flex items-center justify-between">
-                                    <span>Total Harga</span>
-                                    <span class="font-semibold text-gray-900">Rp{{ number_format($cart->total, 0, ',', '.') }}</span>
-                                </div>
-                            </div>
-
-                            <a href="{{ route('checkout.index') }}" class="inline-flex w-full items-center justify-center gap-2 rounded-full bg-pink-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-pink-200 transition hover:bg-pink-700">
+                            <a href="{{ route('checkout.index') }}" class="inline-flex items-center px-6 py-3 rounded-xl bg-pink-600 text-white font-semibold hover:bg-pink-700 transition">
                                 Bayar Sekarang
-                                <i class="fa-solid fa-arrow-right"></i>
                             </a>
                             <a href="{{ route('services.index') }}" class="inline-flex w-full items-center justify-center gap-2 rounded-full border border-pink-200 px-6 py-3 text-sm font-semibold text-pink-600 transition hover:bg-white">
                                 Tambah Layanan Lain

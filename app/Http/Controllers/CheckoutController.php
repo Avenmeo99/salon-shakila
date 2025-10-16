@@ -2,63 +2,38 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Cart;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 
 class CheckoutController extends Controller
 {
-    public function index(Request $request): RedirectResponse|View
+    public function index(Request $request): View
     {
-        $cart = $this->resolveCart($request);
+        $cart = session('cart', ['items' => []]);
+        $items = $cart['items'] ?? [];
 
-        if (! $cart || $cart->items->isEmpty()) {
-            return redirect()
-                ->route('cart.index')
-                ->with('error', 'Keranjang Anda kosong.');
-        }
+        // TODO: Jika menggunakan model Cart + cookie token, ambil item dari database.
+        // Contoh:
+        // $token = $request->cookie(CartController::COOKIE_NAME);
+        // $items = optional(\App\Models\Cart::with('items')->where('token', $token)->first())->items->toArray() ?? $items;
 
-        $cart->loadMissing('items.service');
+        $total = collect($items)->sum(function ($item) {
+            $price = $item['price'] ?? $item['unit_price'] ?? 0;
+            $qty = $item['qty'] ?? 1;
 
-        return view('checkout.index', [
-            'cart' => $cart,
-        ]);
+            return $price * $qty;
+        });
+
+        return view('checkout.index', compact('items', 'total'));
     }
 
-    public function store(Request $request): RedirectResponse
+    public function store(): RedirectResponse
     {
-        $cart = $this->resolveCart($request);
+        session()->forget('cart');
 
-        if (! $cart || $cart->items->isEmpty()) {
-            return redirect()
-                ->route('cart.index')
-                ->with('error', 'Keranjang Anda kosong.');
-        }
+        // TODO: Jika memakai model Cart + cookie token, kosongkan keranjang di database di sini.
 
-        $cart->items()->delete();
-        $cart->fill([
-            'status' => 'completed',
-            'subtotal' => 0,
-            'discount' => 0,
-            'total' => 0,
-        ])->save();
-
-        cookie()->queue(cookie()->forget(CartController::COOKIE_NAME));
-
-        return redirect()
-            ->route('bookings.thanks')
-            ->with('status', 'Pembayaran berhasil dikonfirmasi. Terima kasih telah mempercayakan perawatan Anda kepada kami.');
-    }
-
-    private function resolveCart(Request $request): ?Cart
-    {
-        $token = $request->cookie(CartController::COOKIE_NAME);
-
-        if (! $token) {
-            return null;
-        }
-
-        return Cart::with('items.service')->where('token', $token)->first();
+        return redirect()->route('bookings.thanks')->with('status', 'Pembayaran berhasil. Terima kasih!');
     }
 }

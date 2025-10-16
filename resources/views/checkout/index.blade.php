@@ -17,52 +17,47 @@
                 </div>
             @endif
 
+            @php
+                $itemsCollection = collect($items ?? []);
+            @endphp
+
             <div class="grid gap-8 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
                 <div class="space-y-6">
                     <div class="rounded-3xl border border-pink-100 bg-white p-6 shadow-sm">
                         <h2 class="text-lg font-semibold text-gray-900">Ringkasan Pesanan</h2>
-                        <div class="mt-4 overflow-x-auto">
-                            <table class="min-w-full divide-y divide-pink-100 text-sm">
-                                <thead>
-                                    <tr class="text-left text-gray-500">
-                                        <th class="py-2">Layanan</th>
-                                        <th class="py-2 text-center">Qty</th>
-                                        <th class="py-2 text-right">Harga</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="divide-y divide-pink-50 text-gray-700">
-                                    @foreach($cart->items as $item)
-                                        <tr>
-                                            <td class="py-3 pr-4">
-                                                <p class="font-semibold text-gray-900">{{ $item->name_cache }}</p>
-                                                @if($item->service?->duration)
-                                                    <p class="text-xs text-gray-500">Durasi {{ $item->service->duration }} menit</p>
-                                                @endif
-                                            </td>
-                                            <td class="py-3 text-center font-semibold">{{ $item->qty }}</td>
-                                            <td class="py-3 text-right font-semibold text-gray-900">Rp{{ number_format($item->unit_price * $item->qty, 0, ',', '.') }}</td>
-                                        </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
-                        </div>
+
+                        @if($itemsCollection->isEmpty())
+                            <p class="mt-4 text-sm text-gray-500">Tidak ada item dalam keranjang Anda.</p>
+                        @else
+                            <ul class="mt-4 space-y-4 text-sm text-gray-700">
+                                @foreach($itemsCollection as $item)
+                                    @php
+                                        $name = $item['name'] ?? $item['name_cache'] ?? data_get($item, 'name') ?? data_get($item, 'name_cache') ?? 'Layanan';
+                                        $qty = (int) ($item['qty'] ?? data_get($item, 'qty', 1));
+                                        $price = (float) ($item['price'] ?? data_get($item, 'price') ?? data_get($item, 'unit_price') ?? 0);
+                                        $slot = $item['slot'] ?? data_get($item, 'slot');
+                                        $subtotal = $price * $qty;
+                                    @endphp
+                                    <li class="rounded-2xl border border-pink-50 bg-pink-50/40 p-4">
+                                        <p class="font-semibold text-gray-900">{{ $name }}</p>
+                                        <p class="text-xs text-gray-500">Qty: {{ $qty }} · Rp{{ number_format($price, 0, ',', '.') }}</p>
+                                        @if(! empty($slot))
+                                            <p class="mt-1 text-xs text-gray-500">Jadwal: {{ $slot }}</p>
+                                        @endif
+                                        <p class="mt-2 text-sm font-semibold text-gray-900">Subtotal: Rp{{ number_format($subtotal, 0, ',', '.') }}</p>
+                                    </li>
+                                @endforeach
+                            </ul>
+                        @endif
                     </div>
                 </div>
 
                 <aside class="rounded-3xl border border-pink-100 bg-pink-50/60 p-6">
                     <h2 class="text-lg font-semibold text-gray-900">Total Pembayaran</h2>
                     <dl class="mt-4 space-y-3 text-sm text-gray-600">
-                        <div class="flex items-center justify-between">
-                            <dt>Subtotal</dt>
-                            <dd class="font-semibold text-gray-900">Rp{{ number_format($cart->subtotal, 0, ',', '.') }}</dd>
-                        </div>
-                        <div class="flex items-center justify-between">
-                            <dt>Diskon</dt>
-                            <dd class="font-semibold text-gray-900">Rp{{ number_format($cart->discount, 0, ',', '.') }}</dd>
-                        </div>
                         <div class="flex items-center justify-between border-t border-pink-100 pt-3 text-base font-semibold text-gray-900">
                             <dt>Total</dt>
-                            <dd>Rp{{ number_format($cart->total, 0, ',', '.') }}</dd>
+                            <dd>Rp{{ number_format($total ?? 0, 0, ',', '.') }}</dd>
                         </div>
                     </dl>
 
