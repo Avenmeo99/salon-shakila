@@ -2,51 +2,23 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Support\Str;
 
 class Order extends Model
 {
-    use HasFactory;
-
     protected $fillable = [
-        'code',
-        'user_id',
-        'customer_name',
-        'customer_phone',
-        'subtotal',
-        'discount',
-        'total',
-        'payment_status',
-        'payment_provider',
-        'payment_ref',
+        'order_id','user_id','cart_token',
+        'subtotal','discount','tips','grand_total',
+        'status','payment_type','transaction_id','fraud_status',
+        'paid_at','raw_payload','signature_key',
     ];
 
     protected $casts = [
-        'subtotal' => 'decimal:2',
-        'discount' => 'decimal:2',
-        'total' => 'decimal:2',
+        'subtotal'    => 'integer',
+        'discount'    => 'integer',
+        'tips'        => 'integer',
+        'grand_total' => 'integer',
+        'paid_at'     => 'datetime',
+        'raw_payload' => 'array',
     ];
-
-    protected static function booted(): void
-    {
-        static::creating(function (Order $order) {
-            if (empty($order->code)) {
-                $order->code = strtoupper(Str::random(8));
-            }
-        });
-    }
-
-    public function user(): BelongsTo
-    {
-        return $this->belongsTo(User::class);
-    }
-
-    public function items(): HasMany
-    {
-        return $this->hasMany(OrderItem::class);
-    }
 }
