@@ -35,9 +35,12 @@
                             <x-service-card :service="$service">
                                 <x-slot name="details">
                                     <p class="font-semibold text-gray-800">Isi Paket:</p>
-                                    <ul class="list-disc pl-5 space-y-1">
+                                    <ul class="list-disc pl-5 space-y-1 text-sm text-gray-600">
                                         @foreach($service->packageItems as $item)
-                                            <li>{{ $item->item?->name }} <span class="text-gray-500">&times;{{ $item->qty }}</span></li>
+                                            <li>
+                                                {{ $item->name }}
+                                                <span class="text-gray-500">&times;{{ $item->pivot->qty }}</span>
+                                            </li>
                                         @endforeach
                                     </ul>
                                 </x-slot>

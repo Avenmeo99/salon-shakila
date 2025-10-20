@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use App\Models\PackageItem;
 use App\Models\Service;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
@@ -13,13 +12,6 @@ class ServiceSeeder extends Seeder
     {
         $singlesData = [
             [
-                'name' => 'Cuci & Blow Premium',
-                'type' => 'single',
-                'price' => 75000,
-                'duration_minutes' => 45,
-                'description' => 'Perawatan rambut lengkap mulai dari cuci, masker ringan, hingga blow styling sesuai keinginan.',
-            ],
-            [
                 'name' => 'Hair Spa Organik',
                 'type' => 'single',
                 'price' => 150000,
@@ -27,53 +19,47 @@ class ServiceSeeder extends Seeder
                 'description' => 'Spa rambut dengan bahan organik untuk menguatkan akar dan menutrisi batang rambut.',
             ],
             [
-                'name' => 'Manicure & Gel Polish',
+                'name' => 'Cuci & Blow Premium',
                 'type' => 'single',
-                'price' => 120000,
-                'duration_minutes' => 60,
-                'description' => 'Perawatan kuku tangan lengkap termasuk shaping, cuticle care, dan aplikasi gel polish tahan lama.',
+                'price' => 75000,
+                'duration_minutes' => 45,
+                'description' => 'Perawatan rambut lengkap mulai dari cuci, masker ringan, hingga blow styling sesuai keinginan.',
             ],
         ];
 
-        $singles = collect($singlesData)->mapWithKeys(function ($data) {
+        $singles = collect($singlesData)->mapWithKeys(function (array $data) {
+            $slug = Str::slug($data['name']);
+
             $service = Service::updateOrCreate(
-                ['slug' => Str::slug($data['name'])],
-                array_merge($data, ['is_active' => true])
+                ['slug' => $slug],
+                array_merge($data, [
+                    'slug' => $slug,
+                    'is_active' => true,
+                ])
             );
 
-            return [$service->slug => $service];
+            return [$slug => $service];
         });
 
+        $packageSlug = 'paket-glow-up-weekend';
+
         $package = Service::updateOrCreate(
-            ['slug' => 'paket-glow-up-weekend'],
+            ['slug' => $packageSlug],
             [
                 'name' => 'Paket Glow Up Weekend',
+                'slug' => $packageSlug,
                 'type' => 'package',
-                'price' => 310000,
+                'price' => 225000,
                 'duration_minutes' => 150,
-                'description' => 'Kombinasi hair spa, styling, dan manicure untuk penampilan maksimal di akhir pekan.',
+                'description' => 'Kombinasi hair spa, styling, dan perawatan lain untuk tampilan maksimal di akhir pekan.',
                 'is_active' => true,
             ]
         );
 
-        $package->packageItems()->delete();
-
-        $items = [
-            ['service' => 'cuci-blow-premium', 'qty' => 1],
-            ['service' => 'hair-spa-organik', 'qty' => 1],
-            ['service' => 'manicure-gel-polish', 'qty' => 1],
-        ];
-
-        foreach ($items as $item) {
-            $service = $singles->get($item['service']);
-
-            if ($service) {
-                PackageItem::create([
-                    'package_id' => $package->id,
-                    'item_service_id' => $service->id,
-                    'qty' => $item['qty'],
-                ]);
-            }
-        }
+        $package->packageItems()->sync(
+            $singles->mapWithKeys(fn (Service $service) => [
+                $service->id => ['qty' => 1],
+            ])->all()
+        );
     }
 }

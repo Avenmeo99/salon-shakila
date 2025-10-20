@@ -16,11 +16,36 @@ class Service extends Model
         'price',
         'duration_minutes',
         'is_active',
+        'type',
     ];
 
-    // Harga final (jika nanti ada promo)
+    public function scopeActive($query)
+    {
+        return $query->where('is_active', 1);
+    }
+
+    public function scopeSingles($query)
+    {
+        return $query->where('type', 'single');
+    }
+
+    public function scopePackages($query)
+    {
+        return $query->where('type', 'package');
+    }
+
     public function effectivePrice(): int
     {
-        return $this->price;
+        return (int) $this->price;
+    }
+
+    public function packageItems()
+    {
+        return $this->belongsToMany(
+            self::class,
+            'service_package_items',
+            'package_id',
+            'item_id'
+        )->withPivot('qty')->withTimestamps();
     }
 }
