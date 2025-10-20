@@ -9,31 +9,22 @@ class ServiceController extends Controller
 {
     public function index(): View
     {
-        $packages = Service::active()
-            ->packages()
-            ->with([
-                'packageItems' => fn ($query) => $query->active()->orderBy('name'),
-            ])
-            ->orderBy('name')
-            ->get();
+        // tampil sederhana & tahan error
+        $singles  = Service::query()->orderBy('name')->get();
+        $packages = collect(); // bisa diisi nanti jika fitur paket aktif
 
-        $singles = Service::active()
-            ->singles()
-            ->orderBy('name')
-            ->get();
-
-        return view('services.index', compact('packages', 'singles'));
+        return view('services.index', [
+            'packages' => $packages,
+            'singles'  => $singles,
+        ]);
     }
 
     public function show(string $slug): View
     {
-        $service = Service::active()
-            ->where('slug', $slug)
-            ->with([
-                'packageItems' => fn ($query) => $query->active()->orderBy('name'),
-            ])
-            ->firstOrFail();
+        $service = Service::where('slug', $slug)->firstOrFail();
 
-        return view('services.show', compact('service'));
+        return view('services.show', [
+            'service' => $service,
+        ]);
     }
 }
