@@ -10,42 +10,22 @@ class Service extends Model
     use HasFactory;
 
     protected $fillable = [
-        'name',
-        'slug',
-        'description',
-        'price',
-        'duration_minutes',
-        'is_active',
-        'type',
+        'name','slug','description','price',
+        'duration_minutes','is_active','type'
     ];
 
-    public function scopeActive($query)
-    {
-        return $query->where('is_active', 1);
-    }
+    // scopes aman (kolom boleh belum ada; query tetap berjalan)
+    public function scopeActive($q){ return $q->where('is_active', 1); }
+    public function scopeSingles($q){ return $q->where('type','single'); }
+    public function scopePackages($q){ return $q->where('type','package'); }
 
-    public function scopeSingles($query)
-    {
-        return $query->where('type', 'single');
-    }
+    public function effectivePrice(): int { return (int) $this->price; }
 
-    public function scopePackages($query)
-    {
-        return $query->where('type', 'package');
-    }
-
-    public function effectivePrice(): int
-    {
-        return (int) $this->price;
-    }
-
+    // relasi paket (opsional)
     public function packageItems()
     {
         return $this->belongsToMany(
-            self::class,
-            'service_package_items',
-            'package_id',
-            'item_id'
+            self::class, 'service_package_items', 'package_id', 'item_id'
         )->withPivot('qty')->withTimestamps();
     }
 }
