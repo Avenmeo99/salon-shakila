@@ -5,151 +5,127 @@ namespace App\Http\Controllers;
 use App\Models\Cart;
 use App\Models\Service;
 use Illuminate\Http\Request;
-use Illuminate\Http\RedirectResponse;
-use Illuminate\Contracts\View\View;
+use Illuminate\Support\Str;
 
 class CartController extends Controller
 {
-    /** Nama cookie yang menyimpan token keranjang (harus sama di BookingController) */
     public const COOKIE_NAME = 'cart_token';
 
-    /** Lama cookie (menit) = 14 hari */
-    private const COOKIE_MINUTES = 60 * 24 * 14;
+    /* ====================== helpers ====================== */
 
-    /** Tampilkan isi keranjang */
-    public function index(Request $request): View
+    public function currentCart(): ?Cart
     {
-        $cart = $this->resolveCart($request);
-        $cart->load('items.service');
+        $token = request()->cookie(self::COOKIE_NAME);
+        if (!$token) return null;
+
+        return Cart::with(['items.service'])->where('token', $token)->first();
+    }
+
+    public function currentCartOrCreate(): Cart
+    {
+        $cart = $this->currentCart();
+        if ($cart) return $cart;
+
+        $cart = Cart::create([
+            'token' => (string) Str::uuid(),
+        ]);
+
+        cookie()->queue(cookie(self::COOKIE_NAME, $cart->token, 60 * 24 * 30)); // 30 hari
+        return $cart->fresh(['items.service']);
+    }
+
+    private function calcSubtotal(?Cart $cart): int
+    {
+        if (!$cart) return 0;
+        return (int) $cart->items->sum(fn ($it) => (int) $it->qty * (int) $it->unit_price);
+    }
+
+    /* ====================== routes ====================== */
+
+    public function index()
+    {
+        $cart     = $this->currentCart();
+        $subtotal = $this->calcSubtotal($cart);
 
         return view('cart.index', [
-            'cart' => $cart,
+            'cart'     => $cart,
+            'items'    => $cart?->items ?? collect(),
+            'subtotal' => $subtotal,
+            'total'    => $subtotal, // sederhana (tanpa diskon/tips)
         ]);
     }
 
     /**
-     * Tambah layanan ke keranjang.
-     * Bisa dipanggil via:
-     * - POST /cart               (body: service=slug, qty=1)
-     * - POST /cart/add/{service} (route param: {service:slug}, body: qty=1)
+     * Tambah item ke keranjang (pemesanan normal, bukan booking).
+     * Dipakai tombol "Pesan Sekarang"
      */
-    public function add(Request $request, ?Service $service = null): RedirectResponse
+    public function add(Request $request, ?Service $service = null)
     {
-        // Ambil service dari route param kalau ada, jika tidak ambil dari hidden input "service"
-        if (!$service) {
-            $slug = (string) $request->input('service', '');
-            $service = Service::where('slug', $slug)->firstOrFail();
-        }
+        $cart = $this->currentCartOrCreate();
 
-        $qty = max(1, (int) $request->input('qty', 1));
-
-        // Dapatkan / buat keranjang aktif dari cookie
-        $cart = $this->resolveCart($request);
-
-        // Cek apakah item layanan sudah ada → tambah qty
-        $item = $cart->items()->where('service_id', $service->id)->first();
-
-        if ($item) {
-            $item->qty += $qty;
-            $item->unit_price = $service->effectivePrice();
-            $item->name_cache = $service->name;
-            $item->save();
+        // Bisa add by slug path (route cart.add.slug) atau via form POST name, price, qty
+        if ($service) {
+            $name  = $service->name;
+            $price = (int) ($service->effectivePrice() ?? $service->price);
         } else {
-            $cart->items()->create([
-                'service_id' => $service->id,
-                'name_cache' => $service->name,
-                'unit_price' => $service->effectivePrice(),
-                'qty'        => $qty,
-            ]);
+            $name  = $request->input('name');
+            $price = (int) $request->input('price', 0);
         }
 
-        // Recalculate total (pastikan Cart model punya method recalc())
-        $cart->load('items');
-        if (method_exists($cart, 'recalc')) {
-            $cart->recalc();
-        }
-
-        return redirect()
-            ->route('cart.index')
-            ->with('status', "{$service->name} telah ditambahkan ke keranjang.");
-    }
-
-    /** Ubah kuantitas item */
-    public function updateQty(Request $request, int $id): RedirectResponse
-    {
         $qty = max(1, (int) $request->input('qty', 1));
-        $cart = $this->resolveCart($request);
-        $item = $cart->items()->where('id', $id)->firstOrFail();
 
-        $item->qty = $qty;
-        $item->save();
-
-        $cart->load('items');
-        if (method_exists($cart, 'recalc')) {
-            $cart->recalc();
-        }
-
-        return back()->with('status', 'Jumlah item diperbarui.');
-    }
-
-    /** Hapus satu item */
-    public function remove(Request $request, int $id): RedirectResponse
-    {
-        $cart = $this->resolveCart($request);
-        $item = $cart->items()->where('id', $id)->first();
-
-        if ($item) {
-            $item->delete();
-            $cart->load('items');
-            if (method_exists($cart, 'recalc')) {
-                $cart->recalc();
-            }
-        }
-
-        return back()->with('status', 'Item dihapus dari keranjang.');
-    }
-
-    /** Kosongkan keranjang */
-    public function clear(Request $request): RedirectResponse
-    {
-        $cart = $this->resolveCart($request);
-        $cart->items()->delete();
-
-        $cart->load('items');
-        if (method_exists($cart, 'recalc')) {
-            $cart->recalc();
-        }
-
-        return back()->with('status', 'Keranjang dikosongkan.');
-    }
-
-    /**
-     * Dapatkan keranjang aktif dari cookie; buat baru jika tidak ada.
-     * Cookie dipanjangkan tiap request.
-     */
-    private function resolveCart(Request $request): Cart
-    {
-        $token = $request->cookie(self::COOKIE_NAME);
-
-        if ($token) {
-            $existing = Cart::with('items')->where('token', $token)->first();
-            if ($existing) {
-                // Panjangkan cookie 14 hari lagi
-                cookie()->queue(self::COOKIE_NAME, $existing->token, self::COOKIE_MINUTES);
-                return $existing;
-            }
-        }
-
-        // Buat keranjang baru
-        $cart = new Cart([
-            'token'  => Cart::generateToken(),
-            'status' => 'active',
+        $cart->items()->create([
+            'service_id' => $service?->id,
+            'name_cache' => $name,
+            'qty'        => $qty,
+            'unit_price' => $price,
+            'meta'       => null,
         ]);
-        $cart->save();
-        $cart->load('items');
 
-        cookie()->queue(self::COOKIE_NAME, $cart->token, self::COOKIE_MINUTES);
+        if (method_exists($cart, 'recalc')) $cart->recalc();
 
-        return $cart;
+        // Jika ingin langsung ke checkout
+        if ($request->boolean('go_checkout')) {
+            return redirect()->route('checkout.index');
+        }
+
+        return back()->with('status', "{$name} masuk ke keranjang.");
+    }
+
+    public function updateQty(Request $request, int $id)
+    {
+        $cart = $this->currentCart();
+        if (!$cart) return back();
+
+        $qty = max(1, (int) $request->input('qty', 1));
+
+        $item = $cart->items()->where('id', $id)->first();
+        if ($item) {
+            $item->qty = $qty;
+            $item->save();
+            if (method_exists($cart, 'recalc')) $cart->recalc();
+        }
+
+        return back();
+    }
+
+    public function remove(int $id)
+    {
+        $cart = $this->currentCart();
+        if ($cart) {
+            $cart->items()->where('id', $id)->delete();
+            if (method_exists($cart, 'recalc')) $cart->recalc();
+        }
+        return back();
+    }
+
+    public function clear()
+    {
+        $cart = $this->currentCart();
+        if ($cart) {
+            $cart->items()->delete();
+            if (method_exists($cart, 'recalc')) $cart->recalc();
+        }
+        return back();
     }
 }

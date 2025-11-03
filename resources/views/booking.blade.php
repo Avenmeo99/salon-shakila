@@ -1,120 +1,54 @@
-<x-layout.base :title="'Booking Layanan Salon Shakila'" :description="'Reservasi layanan kecantikan favorit Anda dengan mudah melalui sistem booking online Salon Shakila.'">
-    <x-sections.hero
-        eyebrow="Booking Online"
-        title="Atur Jadwal <span class='text-pink-600'>Perawatan</span> Anda"
-        subtitle="Pilih layanan, tentukan terapis, dan booking jadwal yang sesuai tanpa perlu antre"
-        description="Kami menyediakan sistem reservasi cepat dengan konfirmasi instan. Pilih layanan favorit, jadwalkan sesuai kenyamanan Anda, dan tim kami siap menyambut di salon."
-        :stats="[
-            ['label' => 'Waktu Operasional', 'value' => '09.00 - 20.00'],
-            ['label' => 'Slot Tersedia Hari Ini', 'value' => '18'],
-            ['label' => 'Terapis Profesional', 'value' => '12'],
-        ]"
-    >
-        <x-slot name="primaryButton">
-            <x-ui.button href="#form-booking" variant="primary" size="lg">Mulai Booking</x-ui.button>
-        </x-slot>
-        <x-slot name="secondaryButton">
-            <x-ui.button href="tel:+62211234567" variant="secondary" size="lg">Butuh Bantuan? Hubungi Kami</x-ui.button>
-        </x-slot>
-    </x-sections.hero>
+{{-- resources/views/services/booking.blade.php --}}
+<x-layout.base :title="'Booking ' . ($service->name ?? 'Layanan')">
+  <section class="max-w-3xl mx-auto px-4 py-10">
+    <a href="{{ route('services.show', $service->slug) }}" class="text-sm text-gray-500 hover:text-gray-700">← Kembali</a>
 
-    <section class="py-16 bg-white">
-        <div class="max-w-7xl mx-auto px-6 lg:px-8">
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
-                <div>
-                    <h2 class="text-3xl font-bold text-gray-900">Langkah Booking yang Mudah</h2>
-                    <p class="mt-4 text-lg text-gray-600">Dalam beberapa langkah sederhana, Anda sudah bisa mendapatkan slot perawatan favorit di Salon Shakila.</p>
-                    <div class="mt-8 space-y-6">
-                        <div class="flex">
-                            <div class="w-12 h-12 flex items-center justify-center rounded-full bg-pink-100 text-pink-600 font-bold mr-4">1</div>
-                            <div>
-                                <h3 class="text-xl font-semibold text-gray-900">Pilih Layanan</h3>
-                                <p class="mt-1 text-gray-600">Facial, hair styling, make up, nail art, dan banyak layanan lainnya siap Anda pesan.</p>
-                            </div>
-                        </div>
-                        <div class="flex">
-                            <div class="w-12 h-12 flex items-center justify-center rounded-full bg-pink-100 text-pink-600 font-bold mr-4">2</div>
-                            <div>
-                                <h3 class="text-xl font-semibold text-gray-900">Tentukan Jadwal</h3>
-                                <p class="mt-1 text-gray-600">Pilih tanggal dan jam sesuai kebutuhan Anda. Sistem kami menampilkan slot real-time.</p>
-                            </div>
-                        </div>
-                        <div class="flex">
-                            <div class="w-12 h-12 flex items-center justify-center rounded-full bg-pink-100 text-pink-600 font-bold mr-4">3</div>
-                            <div>
-                                <h3 class="text-xl font-semibold text-gray-900">Konfirmasi & Nikmati Layanan</h3>
-                                <p class="mt-1 text-gray-600">Setelah konfirmasi via email atau WhatsApp, datang tepat waktu dan nikmati pelayanan terbaik kami.</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+    <h1 class="mt-3 text-2xl sm:text-3xl font-bold">Booking {{ $service->name }}</h1>
+    <p class="text-gray-600 mt-1">Pilih jadwal, kami hubungi untuk konfirmasi.</p>
 
-                <div id="form-booking" class="bg-gray-50 rounded-2xl shadow-xl p-8">
-                    <h3 class="text-xl font-semibold text-gray-900">Form Booking Online</h3>
-                    <p class="mt-2 text-sm text-gray-500">Tim kami akan menghubungi Anda untuk konfirmasi dalam 15 menit.</p>
-                    <form class="mt-6 space-y-5">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700">Nama Lengkap</label>
-                            <input type="text" class="mt-1 w-full rounded-lg border-gray-300 focus:border-pink-500 focus:ring-pink-500" placeholder="Masukkan nama Anda">
-                        </div>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700">Nomor Telepon</label>
-                                <input type="tel" class="mt-1 w-full rounded-lg border-gray-300 focus:border-pink-500 focus:ring-pink-500" placeholder="08xxxxxxxxxx">
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700">Email</label>
-                                <input type="email" class="mt-1 w-full rounded-lg border-gray-300 focus:border-pink-500 focus:ring-pink-500" placeholder="nama@email.com">
-                            </div>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700">Pilih Layanan</label>
-                            <select class="mt-1 w-full rounded-lg border-gray-300 focus:border-pink-500 focus:ring-pink-500">
-                                <option>Facial Glow Treatment</option>
-                                <option>Hair Styling & Coloring</option>
-                                <option>Make Up Professional</option>
-                                <option>Nail Art & Manicure</option>
-                                <option>Body Spa & Relaxation</option>
-                            </select>
-                        </div>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700">Tanggal</label>
-                                <input type="date" class="mt-1 w-full rounded-lg border-gray-300 focus:border-pink-500 focus:ring-pink-500">
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700">Waktu</label>
-                                <input type="time" class="mt-1 w-full rounded-lg border-gray-300 focus:border-pink-500 focus:ring-pink-500">
-                            </div>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700">Catatan Tambahan</label>
-                            <textarea rows="3" class="mt-1 w-full rounded-lg border-gray-300 focus:border-pink-500 focus:ring-pink-500" placeholder="Tuliskan preferensi atau permintaan khusus"></textarea>
-                        </div>
-                        <x-ui.button type="submit" variant="primary" class="w-full justify-center">Kirim Permintaan Booking</x-ui.button>
-                        <p class="text-xs text-gray-500 text-center">Dengan mengirim form ini, Anda menyetujui kebijakan privasi Salon Shakila.</p>
-                    </form>
-                </div>
-            </div>
+    <form method="POST" action="{{ route('bookings.store', $service->slug) }}" class="bg-white rounded-2xl border p-6 mt-6 space-y-4">
+      @csrf
+      <div class="grid sm:grid-cols-2 gap-4">
+        <div>
+          <label class="text-sm font-medium">Nama Lengkap</label>
+          <input name="customer_name" class="mt-1 w-full rounded-lg border px-3 py-2" />
         </div>
-    </section>
-
-    <section class="py-16 bg-gray-50">
-        <div class="max-w-7xl mx-auto px-6 lg:px-8">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <x-ui.card variant="gradient" class="h-full">
-                    <h3 class="text-xl font-semibold text-gray-900">Konfirmasi Instan</h3>
-                    <p class="mt-3 text-gray-600">Setelah mengirim form, kami mengirimkan konfirmasi melalui WhatsApp dan email dalam hitungan menit.</p>
-                </x-ui.card>
-                <x-ui.card variant="gradient" class="h-full">
-                    <h3 class="text-xl font-semibold text-gray-900">Pengingat Otomatis</h3>
-                    <p class="mt-3 text-gray-600">Terima pengingat H-1 dan H-2 jam sebelum jadwal agar Anda tidak melewatkan sesi perawatan.</p>
-                </x-ui.card>
-                <x-ui.card variant="gradient" class="h-full">
-                    <h3 class="text-xl font-semibold text-gray-900">Pembayaran Fleksibel</h3>
-                    <p class="mt-3 text-gray-600">Pilih pembayaran di salon, transfer bank, atau e-wallet favorit Anda saat konfirmasi.</p>
-                </x-ui.card>
-            </div>
+        <div>
+          <label class="text-sm font-medium">WhatsApp</label>
+          <input name="whatsapp" class="mt-1 w-full rounded-lg border px-3 py-2" />
         </div>
-    </section>
+      </div>
+
+      <div class="grid sm:grid-cols-2 gap-4">
+        <div>
+          <label class="text-sm font-medium">Tanggal</label>
+          <input type="date" name="date" value="{{ now()->toDateString() }}" required class="mt-1 w-full rounded-lg border px-3 py-2" />
+        </div>
+        <div>
+          <label class="text-sm font-medium">Jam</label>
+          <select name="time" required class="mt-1 w-full rounded-lg border px-3 py-2">
+            <option value="" hidden>Pilih jam</option>
+            @foreach($timeblocks as $tb)
+              <option value="{{ $tb }}">{{ $tb }}</option>
+            @endforeach
+          </select>
+        </div>
+      </div>
+
+      <div>
+        <label class="text-sm font-medium">Catatan</label>
+        <textarea name="note" rows="3" class="mt-1 w-full rounded-lg border px-3 py-2" placeholder="Opsional"></textarea>
+      </div>
+
+      <div class="flex items-center gap-2 text-sm text-gray-700">
+        <input type="checkbox" checked disabled class="rounded border-gray-300">
+        <span>Bayar melalui checkout (DP 50%).</span>
+      </div>
+
+      <div class="flex items-center gap-3 pt-2">
+        <button class="px-5 py-2 rounded-xl bg-pink-600 text-white font-semibold hover:bg-pink-700">Kirim Booking</button>
+        <a href="{{ route('services.index') }}" class="px-4 py-2 rounded-xl border hover:bg-gray-50">Batal</a>
+      </div>
+    </form>
+  </section>
 </x-layout.base>

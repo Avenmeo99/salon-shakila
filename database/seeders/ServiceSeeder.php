@@ -10,6 +10,7 @@ class ServiceSeeder extends Seeder
 {
     public function run(): void
     {
+<<<<<<< HEAD
         $singlesData = [
             [
                 'name' => 'Hair Spa Organik',
@@ -61,5 +62,34 @@ class ServiceSeeder extends Seeder
                 $service->id => ['qty' => 1],
             ])->all()
         );
+=======
+        $items = [
+            ['Cuci & Blow Premium',       'Cuci rambut & blow kering.',                      75000],
+            ['Hair Spa Organik',          'Perawatan rambut bahan alami.',                   150000],
+            ['Paket Glow Up Weekend',     'Perawatan lengkap akhir pekan.',                  310000],
+            ['Hair Mask Keratin',         'Masker rambut untuk kilau sehat.',                180000],
+            ['Creambath Aloe Vera',       'Creambath menyehatkan kulit kepala.',             120000],
+            ['Hand & Foot Spa',           'Perawatan tangan dan kaki untuk relaksasi.',      130000],
+            ['Makeup Natural Event',      'Riasan natural untuk acara spesial.',             200000],
+            ['Hair Coloring Single Tone', 'Pewarnaan rambut satu warna.',                    350000],
+            ['Smoothing Light',           'Smoothing ringan untuk rambut halus.',            400000],
+            // promo
+            ['Paket Hemat Cantik 1',      'Cuci & Blow + Hair Spa Organik.',                 210000],
+            ['Paket Hemat Cantik 2',      'Creambath + Hand & Foot Spa.',                    230000],
+            ['Paket Premium Glow',        'Glow Up + Makeup Natural Event.',                 480000],
+        ];
+
+        foreach ($items as [$name, $desc, $price]) {
+            Service::firstOrCreate(
+                ['slug' => Str::slug($name)],
+                [
+                    'name'        => $name,
+                    'description' => $desc,
+                    'price'       => $price,
+                    'image_url'   => 'images/salon1.jpg', // satu gambar untuk semua
+                ]
+            );
+        }
+>>>>>>> 198812f (First commit - upload salon_shakila project)
     }
 }

@@ -10,6 +10,7 @@ class Service extends Model
     use HasFactory;
 
     protected $fillable = [
+<<<<<<< HEAD
         'name','slug','description','price',
         'duration_minutes','is_active','type'
     ];
@@ -27,5 +28,13 @@ class Service extends Model
         return $this->belongsToMany(
             self::class, 'service_package_items', 'package_id', 'item_id'
         )->withPivot('qty')->withTimestamps();
+=======
+        'name', 'slug', 'description', 'price', 'image_url',
+    ];
+
+    public function effectivePrice(): int
+    {
+        return (int) $this->price;
+>>>>>>> 198812f (First commit - upload salon_shakila project)
     }
 }
